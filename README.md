@@ -94,3 +94,140 @@
 
     > ng-model에 값에 변수를 텍스트 형식으로 넣어두면 텍스트 input의 기본값으로 변수가 들어간다. 그리고 그 변수는 서로 바인딩 되어서 html에서 작동하여 변수가 변경되면 javascript의 변수도 변경됩니다. 이를 양방향 바인딩이라고 합니다.
 
+## ng-repeat
+
+    // javascript 단
+    app.controller('TodoCtrl', ['$scope', function($scope){
+        $scope.todos = [
+            {
+                id : 1,
+                title: '요가 수련',
+                completed: false,
+                createdAt: Date.now()
+            },
+            {
+                id : 2,
+                title: '앵귤러 학습',
+                completed: false,
+                createdAt: Date.now()
+            },
+            {
+                id : 3,
+                title: '운동하기',
+                completed: true,
+                createdAt: Date.now()
+            }
+        ]
+    }]);
+    >
+    //  html 단
+    ...
+    <body ng-app="todo" ng-controller="TodoCtrl">
+        <h1>Todo</h1>
+        <ul>
+            <li ng-repeat="todo in todos">
+                <input type="text" ng-model="todo.title">
+                <input type="checkbox" ng-model="todo.completed">
+                <date>{{ todo.createdAt }}</date>
+            </li>
+        </ul>
+    </body>
+    ...
+
+- 위와 같이 코드를 수행하면 충분히 todo 인자에 todos 리스트의 값이 반복문의 형태를 띄고 들어가게 되고 결과적으로는 리스트의 내용 출력이 이루어지게 됩니다.
+
+
+## 부트스트랩 적용
+
+- 아래 내용은 물론 bootstrap을 import 했을 경우에만 적용됩니다.
+>
+    //  html 단
+    ...
+    <body ng-app="todo" ng-controller="TodoCtrl">
+        <h1>Todo</h1>
+        <ul class="list-unstyled">
+            <li ng-repeat="todo in todos">
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <input type="checkbox" ng-model="todo.completed">
+                    </span>
+                    <input type="text" class="form-control" ng-model="todo.title">
+                </div>
+                <date>{{ todo.createdAt }}</date>
+            </li>
+        </ul>
+    </body>
+    ...
+
+## ng-filter
+
+- 기존에 epoch time으로 출력되던 `todo.createAt` 변수를 읽기 쉬운 형태로 출력해 주려면 아래와 같이 작성합니다.
+
+        <date>{{ todo.createAt | date }}</date>
+
+- 포맷을 추가해주고 싶을 경우에는 date 뒤쪽에 아래와 같이 추가해 줍니다.
+
+        <date>{{ todo.createAt | date:'yyyy-MM-dd HH:mm:ss' }}</date>
+
+## ng-click
+
+- 위쪽에서 작성했던 todos 리스트의 아이템들을 삭제하는 버튼을 만듭니다.
+- 이런식으로 작동되는 이벤트들을 핸들러라고 부릅니다.
+
+        // html 단
+        <div class="input-group">
+            <span class="input-group-addon">
+                <input type="checkbox" ng-model="todo.completed">
+            </span>
+            <input type="text" class="form-control" ng-model="todo.title">
+            <span class="input-group-btn">
+                <button class="btn btn-danger" type="button" ng-click="remove(todo)">삭 제</button>
+            </span>
+        </div>
+>
+        // javascript 단 : todo 내용 한개에 대해 전달받음
+        ...
+        $scope.remove = function(todo) {
+            // find todo index in todos
+            var idx = $scope.todos.findIndex(function(todo){
+                return item.id === todo.id
+            });
+            // remove from todos
+            if (idx > -1) {
+                $scope.todos.splice(idx, 1);
+            }
+
+        };
+
+## 필터 버튼
+
+- checkbox 항목에 따라 보이거나 안 보이도록 합니다.
+- ng-reapeat 디렉티브에도 필터를 적용할 수 있습니다.
+- 아래의 코드방식대로 이용하여 특정 항목을 보이거나 안 보이도록 할 수 있습니다.
+
+>
+    //  html 단
+    ...
+    <body ng-app="todo" ng-controller="TodoCtrl">
+        <div class="container">
+            <h1>ToDo List</h1>
+            <ul class="list-unstyled">
+                <li ng-repeat="todo in todos | filter: statusFilter">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <input type="checkbox" ng-model="todo.completed">
+                        </span>
+                        <input type="text" class="form-control" ng-model="todo.title">
+                        <span class="input-group-btn">
+                            <button class="btn btn-danger" type="button" ng-click="remove(todo)">삭 제</button>
+                        </span>
+                    </div>
+                </li>
+            </ul>
+
+            <button class="btn btn-primary" ng-click="statusFilter = {completed: true}">Completed</button>
+            <button class="btn btn-primary" ng-click="statusFilter = {completed: false}">Active</button>
+            <button class="btn btn-primary" ng-click="statusFilter = {}">All</button>
+        </div>
+    </body>
+    ...
